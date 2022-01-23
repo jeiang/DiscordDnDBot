@@ -14,4 +14,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Commands\" />
+    <Folder Include="Services\Events\" />
+    <Folder Include="Types\Converters\" />
+    <Folder Include="Types\Database\" />
+  </ItemGroup>
+
 </Project>

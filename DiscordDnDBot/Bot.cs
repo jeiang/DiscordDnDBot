@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace DiscordDnDBot
 {
-    public class Program
+    internal class Bot
     {
-
     }
 }
