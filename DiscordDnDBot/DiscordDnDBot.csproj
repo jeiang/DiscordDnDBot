@@ -10,15 +10,10 @@
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="3.2.0" />
     <PackageReference Include="LiteDB" Version="5.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.2-mauipre.1.22054.8" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.2-mauipre.1.22054.8" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.2-mauipre.1.22054.8" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\Commands\" />
-    <Folder Include="Services\Events\" />
-    <Folder Include="Types\Converters\" />
-    <Folder Include="Types\Database\" />
   </ItemGroup>
 
 </Project>
