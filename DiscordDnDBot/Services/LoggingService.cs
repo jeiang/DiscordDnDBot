@@ -67,9 +67,20 @@ namespace DiscordDnDBot.Services
             _interactionService = interactionService;
             _configurationRoot = configurationRoot;
 
-            if (!int.TryParse(_configurationRoot["severity"], out _logLevel))
+            string configLogLevel = _configurationRoot["LogLevel"].ToLowerInvariant();
+            string? logLevel = 
+                Enum.GetNames(typeof(LogSeverity))
+                .Select(x => x.ToLowerInvariant())
+                .Where((name) => name == configLogLevel)
+                .FirstOrDefault();
+
+            if (string.IsNullOrEmpty(logLevel))
             {
                 _logLevel = (int)LogSeverity.Info;
+            } 
+            else
+            {
+                _logLevel = (int)Enum.Parse(typeof(LogSeverity), logLevel);
             }
 
             _client.Log += LogAsync;
@@ -120,6 +131,12 @@ namespace DiscordDnDBot.Services
             await consoleOutput.WriteLineAsync(output);
             using StreamWriter writer = _logFile.AppendText();
             await writer.WriteLineAsync(output);
+        }
+    
+        public async Task LogAsync(string message, string source, LogSeverity severity = LogSeverity.Info, 
+            Exception? exception = null)
+        {
+            await LogAsync(new LogMessage(severity, message, source, exception));
         }
     }
 }

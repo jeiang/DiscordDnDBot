@@ -1,6 +1,5 @@
 ﻿using DiscordDnDBot.Services;
 
-using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 
@@ -21,47 +20,44 @@ namespace DiscordDnDBot
 
         public Startup(string[] _)
         {
-            var builder = new ConfigurationBuilder()        // Create a new instance of the config builder
-                .SetBasePath(AppContext.BaseDirectory)      // Specify the default location for the config file
-                .AddJsonFile("_config.json");                // Add this (json encoded) file to the configuration
-            Configuration = builder.Build();                // Build the configuration
+            var builder = new ConfigurationBuilder()    // Create a new instance of the config builder
+                .SetBasePath(AppContext.BaseDirectory)  // Specify the default location for the config file
+                .AddJsonFile("config.json", false);    // Add this (json encoded) file to the configuration
+            Configuration = builder.Build();            // Build the configuration
         }
 
         public async Task RunAsync()
         {
-            var services = new ServiceCollection();             // Create a new instance of a service collection
+            var services = new ServiceCollection();     // Create a new instance of a service collection
             ConfigureServices(services);
 
-            var provider = services.BuildServiceProvider();     // Build the service provider
-            provider.GetRequiredService<LoggingService>();      // Start the logging service
-            provider.GetRequiredService<CommandHandler>(); 		// Start the command handler service
-
-            await provider.GetRequiredService<StartupService>().StartAsync();       // Start the startup service
-            await Task.Delay(-1);                               // Keep the program alive
+            var provider = services.BuildServiceProvider();                     // Build the service provider
+            provider.GetRequiredService<LoggingService>();                      // Start the logging service
+            provider.GetRequiredService<ApplicationCommandService>(); 		    // Start the command handler service
+            await provider.GetRequiredService<StartupService>().StartAsync();   // Start the startup service
+            await Task.Delay(-1);                                               // Keep the program alive
         }
 
         private void ConfigureServices(IServiceCollection services)
         {
-            var client =
-                new DiscordSocketClient(new DiscordSocketConfig
-                {                                       // Add discord to the collection
-                    LogLevel = LogSeverity.Verbose,     // Tell the logger to give Verbose amount of info
-                    MessageCacheSize = 1000             // Cache 1,000 messages per channel
-                });
-            var interactionService =
-                new InteractionService(client, new InteractionServiceConfig
-                {                                       // Add the command service to the collection
-                    LogLevel = LogSeverity.Verbose,     // Tell the logger to give Verbose amount of info
-                    DefaultRunMode = RunMode.Async,     // Force all commands to run async by default
-                });
+            DiscordSocketConfig clientConfig = new();
+            Configuration.GetSection(nameof(DiscordSocketConfig)).Bind(clientConfig);
 
-            services.AddSingleton(client)
-            .AddSingleton(interactionService)
-            .AddSingleton<CommandHandler>()         // Add the command handler to the collection
-            .AddSingleton<StartupService>()         // Add startupservice to the collection
-            .AddSingleton<LoggingService>()         // Add loggingservice to the collection
-            .AddSingleton<Random>()                 // Add random to the collection
-            .AddSingleton(Configuration);           // Add the configuration to the collection
+            InteractionServiceConfig interactionServiceConfig = new();
+            Configuration.GetSection(nameof(InteractionServiceConfig)).Bind(interactionServiceConfig);
+
+            DiscordSocketClient client = new(clientConfig);
+            InteractionService interactionService = new(client, interactionServiceConfig);
+
+            services
+                .AddSingleton(client)
+                .AddSingleton(interactionService)
+                .AddSingleton<ApplicationCommandService>()  // Add the command handler to the collection
+                .AddSingleton<StartupService>()             // Add startupservice to the collection
+                .AddSingleton<LoggingService>()             // Add loggingservice to the collection
+                .AddSingleton<DatabaseService>()             // Add loggingservice to the collection
+                .AddSingleton<Random>()                     // Add random to the collection
+                .AddSingleton(Configuration);               // Add the configuration to the collection
         }
     }
 }
