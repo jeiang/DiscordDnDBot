@@ -1,12 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DiscordDnDBot.Services;
+
+using Discord;
+using Discord.Interactions;
+using Discord.WebSocket;
+
+using Newtonsoft.Json;
 
 namespace DiscordDnDBot.Types
 {
     internal class Config
     {
+        [Flags]
+        public enum CommandInitializationOptions
+        {
+            None,
+            LoadCommands,
+            ClearAllCommands
+        }
+
+        public string Token { get; private set; } = String.Empty;
+
+        public ulong? TestingGuild { get; private set; }
+
+        public InteractionServiceConfig InteractionServiceConfig { get; private set; }
+
+        public DiscordSocketConfig WebSocketConfig { get; private set; }
+
+        public LogSeverity LogLevel { get; private set; } = Discord.LogSeverity.Info;
+
+        public CommandInitializationOptions CommandInitialization { get; private set; } = CommandInitializationOptions.None;
+
+        [JsonConstructor]
+        public Config(string token, ulong? testingGuild, InteractionServiceConfig interactionServiceConfig,
+            DiscordSocketConfig discordSocketConfig, LogSeverity logSeverity, 
+            CommandInitializationOptions commandInitialization)
+        {
+            Token = token;
+            TestingGuild = testingGuild;
+            InteractionServiceConfig = interactionServiceConfig;
+            WebSocketConfig = discordSocketConfig;
+            LogLevel = logSeverity;
+            CommandInitialization = commandInitialization;
+
+            WebSocketConfig.LogLevel = LogLevel;
+            InteractionServiceConfig.LogLevel = LogLevel;
+
+            LogHandler.LogLevel = LogLevel;
+        }
     }
 }
