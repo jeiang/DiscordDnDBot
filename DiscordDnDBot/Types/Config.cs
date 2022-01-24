@@ -10,6 +10,15 @@ namespace DiscordDnDBot.Types
 {
     internal class Config
     {
+        public static Config Default
+        {
+            get
+            {
+                return new Config(string.Empty, null, new InteractionServiceConfig(), new DiscordSocketConfig(),
+                    LogSeverity.Info, Config.CommandInitializationOptions.None);
+            }
+        }
+
         [Flags]
         public enum CommandInitializationOptions
         {
@@ -18,7 +27,7 @@ namespace DiscordDnDBot.Types
             ClearAllCommands
         }
 
-        public string Token { get; private set; } = String.Empty;
+        public string Token { get; set; } = String.Empty;
 
         public ulong? TestingGuild { get; private set; }
 
