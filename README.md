@@ -19,4 +19,4 @@ I used a parts of the core design from [this example bot](https://github.com/Aux
 - TimeZoneNames
 
 ## Acknowledgements
-[This guy](https://github.com/Aux) who made the example bot and made me realize that I did not understand Dependency Injection and how to most efficiently use it.
+[This guy](https://github.com/Aux) who made the example bot and made me realize that I did not understand Dependency Injection and how to use it.
