@@ -2,6 +2,7 @@
 using System.Text;
 
 using DiscordDnDBot.Helpers;
+using DiscordDnDBot.Types.Converters;
 
 using Discord;
 using Discord.Interactions;
@@ -21,6 +22,8 @@ namespace DiscordDnDBot.Services
 
         private async Task ClientReady()
         {
+            _interactions.AddTypeConverter<DateTime>(new DateTimeConverter());
+
             ModuleInfo[] modulesToLoad = (await _interactions.AddModulesAsync(
                 assembly: Assembly.GetEntryAssembly(),
                 services: _services)).ToArray();
@@ -100,6 +103,7 @@ namespace DiscordDnDBot.Services
                 loadedCommands.Add(guildId, guildCommands);
             }
 
+            // TODO: Create recursive function to walk through IApplicationCommand Groups
             StringBuilder sb = new("Currently active commands:\n");
             foreach (var guildCommandPair in loadedCommands)
             {
@@ -128,11 +132,7 @@ namespace DiscordDnDBot.Services
         {
             if (!result.IsSuccess)
             {
-                IUserMessage? originalMessage = await ctx.Interaction.GetOriginalResponseAsync();
-                if (originalMessage != null)
-                {
-                    await originalMessage.DeleteAsync();
-                }
+                await ctx.Interaction.DeleteOriginalResponseAsync();
 
                 string output = result.Error switch
                 {

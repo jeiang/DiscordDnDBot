@@ -67,21 +67,10 @@ namespace DiscordDnDBot.Services
             _interactionService = interactionService;
             _configurationRoot = configurationRoot;
 
-            string configLogLevel = _configurationRoot["LogLevel"].ToLowerInvariant();
-            string? logLevel = 
-                Enum.GetNames(typeof(LogSeverity))
-                .Select(x => x.ToLowerInvariant())
-                .Where((name) => name == configLogLevel)
-                .FirstOrDefault();
-
-            if (string.IsNullOrEmpty(logLevel))
-            {
-                _logLevel = (int)LogSeverity.Info;
-            } 
-            else
-            {
-                _logLevel = (int)Enum.Parse(typeof(LogSeverity), logLevel);
-            }
+            _logLevel = 
+                Enum.TryParse(_configurationRoot["LogLevel"], out LogSeverity logLevel) 
+                ? (int)logLevel 
+                : (int)LogSeverity.Info;
 
             _client.Log += LogAsync;
             _interactionService.Log += LogAsync;
@@ -89,7 +78,7 @@ namespace DiscordDnDBot.Services
 
         public async Task LogAsync(LogMessage message)
         {
-            if ((int)message.Severity < _logLevel)
+            if ((int)message.Severity > _logLevel)
             {
                 return;
             }

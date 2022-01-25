@@ -27,7 +27,6 @@ namespace DiscordDnDBot.Services
                 throw new Exception("Please enter your bot's token into the `config.json` " +
                     "file found in the applications root directory.");
             }
-
             await _discord.LoginAsync(TokenType.Bot, discordToken);     // Login to discord
             await _discord.StartAsync();                                // Connect to the websocket
         }
