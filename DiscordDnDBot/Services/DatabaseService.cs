@@ -8,75 +8,98 @@ using Microsoft.Extensions.Configuration;
 
 namespace DiscordDnDBot.Services
 {
-    public class DatabaseService
+    public class DatabaseService : IDisposable
     {
+        // add new database for cached data
         private readonly IConfiguration _config;
         private readonly LoggingService _loggingService;
-        private readonly BsonMapper _mapper;
-        private readonly string _databaseName;
+        private readonly LiteDatabase db;
 
-        private LiteDatabase GetDatabase()
+        private static BsonMapper CreateBsonMapper()
         {
-            if(!File.Exists(_databaseName))
+            BsonMapper mapper = new()
             {
-                _loggingService.LogAsync("DatabaseService", $"Creating empty database.", 
-                    Discord.LogSeverity.Warning).Wait();
-                File.Create(_databaseName).Dispose();
-            }
+                EmptyStringToNull = true,
+                EnumAsInteger = true
+            };
 
-            return new LiteDatabase(_databaseName);
+            mapper.RegisterType(
+                serialize: (tzi) => tzi.ToSerializedString(),
+                deserialize: (tzi) => TimeZoneInfo.FromSerializedString(tzi));
+            
+            return mapper;
         }
 
         public DatabaseService(IConfigurationRoot configurationRoot, LoggingService loggingService)
         {
             _config = configurationRoot;
             _loggingService = loggingService;
-            
+
+            string databaseName;
             try
             {
-                if (string.IsNullOrWhiteSpace(_config["DatabasePath"]))
-                {
-                    _databaseName = Path.Combine(AppContext.BaseDirectory, "Database.db");
-                }
-                else
-                {
-                    _databaseName = new FileInfo(_config["DatabasePath"]).FullName;
-                }
+                databaseName = 
+                    string.IsNullOrWhiteSpace(_config["DatabasePath"])
+                    ? Path.Combine(AppContext.BaseDirectory, "Database.db")
+                    : new FileInfo(_config["DatabasePath"]).FullName;
             }
             catch (Exception ex)
             {
                 _loggingService.LogAsync("DatabaseService", $"Unable to create database at {_config["DatabasePath"]}." +
-                    $"Using default path", Discord.LogSeverity.Warning, ex).Wait();
-                _databaseName = Path.Combine(AppContext.BaseDirectory, "Database.db");
+                    $"Using default path", LogSeverity.Warning, ex).Wait();
+                databaseName = Path.Combine(AppContext.BaseDirectory, "Database.db");
             }
 
-            _mapper = new BsonMapper()
+            BsonMapper mapper = CreateBsonMapper();
+
+            db = new LiteDatabase(new ConnectionString()
             {
-                EmptyStringToNull = true,
-                EnumAsInteger = true
-            };
+                Filename = databaseName,
+                Password = nameof(DiscordDnDBot),
+                Upgrade = true,
+                Connection = ConnectionType.Shared
+            }, mapper);
         }
 
-        public async Task AddOrUpdate(Player player)
+        /// <summary>
+        /// Add 
+        /// </summary>
+        /// <param name="player">Player to add to the database.</param>
+        /// <returns>True if added new, false if updated existing.</returns>
+        public async Task<bool> AddOrUpdate(Player player)
         {
-            using LiteDatabase db = GetDatabase();
             ILiteCollection<Player> collection = db.GetCollection<Player>();
             await _loggingService.LogAsync("DatabaseService", $"Saving/Updating user: {player.Id}.", 
-                Discord.LogSeverity.Verbose);
-            _ = collection.Upsert(player);
+                LogSeverity.Verbose);
+            return collection.Upsert(player);
         }
 
-        public async Task DeletePlayer(Player playerToDelete)
+        public async Task<bool> DeletePlayer(Player player)
         {
-            using LiteDatabase db = GetDatabase();
             ILiteCollection<Player> collection = db.GetCollection<Player>();
-            await _loggingService.LogAsync("DatabaseService", $"Deleting user: {playerToDelete.Id}", 
+            await _loggingService.LogAsync("DatabaseService", $"Deleting user: {player.Id}", 
                 LogSeverity.Verbose);
-            if (!collection.Delete(playerToDelete.Id))
+            bool success = collection.Delete(player.Id);
+            if (!success)
             {
-                await _loggingService.LogAsync("DatabaseService", $"Failed to delete user: {playerToDelete.Id}",
+                await _loggingService.LogAsync("DatabaseService", $"Failed to delete user: {player.Id}",
                     LogSeverity.Warning);
             }
+            return success;
+        }
+
+        public async Task<Player?> GetPlayer(ulong id)
+        {
+            ILiteCollection<Player> collection = db.GetCollection<Player>();
+            await _loggingService.LogAsync("DatabaseService", $"Retrieving user: {id}",
+                LogSeverity.Verbose);
+            return collection.FindOne(player => player.Id == id);
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            db.Dispose();
         }
     }
 }
