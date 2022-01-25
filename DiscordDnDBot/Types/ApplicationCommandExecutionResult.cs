@@ -9,7 +9,7 @@ namespace DiscordDnDBot.Types
 
         public static ApplicationCommandExecutionResult FromSuccess() => new(null, "");
 
-        public static ApplicationCommandExecutionResult FromError(InteractionCommandError? error, string reason) 
+        public static ApplicationCommandExecutionResult FromError(InteractionCommandError? error, string reason)
             => new(error, reason);
     }
 }

@@ -1,9 +1,6 @@
-﻿using DiscordDnDBot.Types.Database;
-
-using Discord;
-
+﻿using Discord;
+using DiscordDnDBot.Types.Database;
 using LiteDB;
-
 using Microsoft.Extensions.Configuration;
 
 namespace DiscordDnDBot.Services
@@ -26,7 +23,7 @@ namespace DiscordDnDBot.Services
             mapper.RegisterType(
                 serialize: (tzi) => tzi.ToSerializedString(),
                 deserialize: (tzi) => TimeZoneInfo.FromSerializedString(tzi));
-            
+
             return mapper;
         }
 
@@ -38,7 +35,7 @@ namespace DiscordDnDBot.Services
             string databaseName;
             try
             {
-                databaseName = 
+                databaseName =
                     string.IsNullOrWhiteSpace(_config["DatabasePath"])
                     ? Path.Combine(AppContext.BaseDirectory, "Database.db")
                     : new FileInfo(_config["DatabasePath"]).FullName;
@@ -69,7 +66,7 @@ namespace DiscordDnDBot.Services
         public async Task<bool> AddOrUpdate(Player player)
         {
             ILiteCollection<Player> collection = db.GetCollection<Player>();
-            await _loggingService.LogAsync("DatabaseService", $"Saving/Updating user: {player.Id}.", 
+            await _loggingService.LogAsync("DatabaseService", $"Saving/Updating user: {player.Id}.",
                 LogSeverity.Verbose);
             return collection.Upsert(player);
         }
@@ -77,7 +74,7 @@ namespace DiscordDnDBot.Services
         public async Task<bool> DeletePlayer(Player player)
         {
             ILiteCollection<Player> collection = db.GetCollection<Player>();
-            await _loggingService.LogAsync("DatabaseService", $"Deleting user: {player.Id}", 
+            await _loggingService.LogAsync("DatabaseService", $"Deleting user: {player.Id}",
                 LogSeverity.Verbose);
             bool success = collection.Delete(player.Id);
             if (!success)
