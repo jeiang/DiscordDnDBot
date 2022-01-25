@@ -5,16 +5,19 @@ namespace DiscordDnDBot.Types.Database
     public class Player
     {
         [BsonId]
-        public int Id { get; }
-        public string Timezone { get; }
-        public long Offset { get; }
+        public ulong Id { get; set; }
+        public TimeZoneInfo TimeZone { get; set; }
 
-        [BsonCtor]
-        public Player(int id, string timezone, long offset)
+        public Player()
         {
-            Id = id;
-            Timezone = timezone;
-            Offset = offset;
+            Id = 0;
+            TimeZone = TimeZoneInfo.Local;
+        }
+
+        public Player(ulong _id, TimeZoneInfo timeZone)
+        {
+            Id = _id;
+            TimeZone = timeZone;
         }
     }
 }
