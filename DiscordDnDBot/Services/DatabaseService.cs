@@ -7,7 +7,7 @@ namespace DiscordDnDBot.Services
     public class DatabaseService : IDisposable
     {
         // add new database for cached data
-        private readonly IConfiguration _config;
+        private readonly IConfigurationRoot _config;
 
         private readonly LoggingService _loggingService;
         private readonly LiteDatabase db;
@@ -27,7 +27,7 @@ namespace DiscordDnDBot.Services
             return mapper;
         }
 
-        public DatabaseService(IConfiguration configurationRoot, LoggingService loggingService)
+        public DatabaseService(IConfigurationRoot configurationRoot, LoggingService loggingService)
         {
             _config = configurationRoot;
             _loggingService = loggingService;

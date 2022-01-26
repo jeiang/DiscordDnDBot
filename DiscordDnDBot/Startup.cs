@@ -31,8 +31,8 @@ namespace DiscordDnDBot
             ConfigureServices(services);
 
             var provider = services.BuildServiceProvider();                     // Build the service provider
-            _ = provider.GetRequiredService<LoggingService>();                      // Start the logging service
-            _ = provider.GetRequiredService<ApplicationCommandService>(); 		    // Start the command handler service
+            _ = provider.GetRequiredService<LoggingService>();                  // Start the logging service
+            _ = provider.GetRequiredService<ApplicationCommandService>(); 		// Start the command handler service
             _ = provider.GetRequiredService<DiscordEventService>();
             await provider.GetRequiredService<StartupService>().StartAsync();   // Start the startup service
             await Task.Delay(-1);                                               // Keep the program alive
