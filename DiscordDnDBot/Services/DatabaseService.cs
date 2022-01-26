@@ -1,5 +1,4 @@
 ﻿using Discord;
-using DiscordDnDBot.Types.Database;
 using LiteDB;
 using Microsoft.Extensions.Configuration;
 
@@ -9,6 +8,7 @@ namespace DiscordDnDBot.Services
     {
         // add new database for cached data
         private readonly IConfiguration _config;
+
         private readonly LoggingService _loggingService;
         private readonly LiteDatabase db;
 
@@ -27,7 +27,7 @@ namespace DiscordDnDBot.Services
             return mapper;
         }
 
-        public DatabaseService(IConfigurationRoot configurationRoot, LoggingService loggingService)
+        public DatabaseService(IConfiguration configurationRoot, LoggingService loggingService)
         {
             _config = configurationRoot;
             _loggingService = loggingService;
@@ -58,40 +58,7 @@ namespace DiscordDnDBot.Services
             }, mapper);
         }
 
-        /// <summary>
-        /// Add 
-        /// </summary>
-        /// <param name="player">Player to add to the database.</param>
-        /// <returns>True if added new, false if updated existing.</returns>
-        public async Task<bool> AddOrUpdate(Player player)
-        {
-            ILiteCollection<Player> collection = db.GetCollection<Player>();
-            await _loggingService.LogAsync("DatabaseService", $"Saving/Updating user: {player.Id}.",
-                LogSeverity.Verbose);
-            return collection.Upsert(player);
-        }
-
-        public async Task<bool> DeletePlayer(Player player)
-        {
-            ILiteCollection<Player> collection = db.GetCollection<Player>();
-            await _loggingService.LogAsync("DatabaseService", $"Deleting user: {player.Id}",
-                LogSeverity.Verbose);
-            bool success = collection.Delete(player.Id);
-            if (!success)
-            {
-                await _loggingService.LogAsync("DatabaseService", $"Failed to delete user: {player.Id}",
-                    LogSeverity.Warning);
-            }
-            return success;
-        }
-
-        public async Task<Player?> GetPlayer(ulong id)
-        {
-            ILiteCollection<Player> collection = db.GetCollection<Player>();
-            await _loggingService.LogAsync("DatabaseService", $"Retrieving user: {id}",
-                LogSeverity.Verbose);
-            return collection.FindOne(player => player.Id == id);
-        }
+        public LiteDatabase GetDatabase() => db;
 
         public void Dispose()
         {
