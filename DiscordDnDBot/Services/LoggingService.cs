@@ -1,11 +1,9 @@
-﻿using System.Text;
-
-using Discord;
+﻿using Discord;
 using Discord.Interactions;
 using Discord.Net;
 using Discord.WebSocket;
-
 using Microsoft.Extensions.Configuration;
+using System.Text;
 
 namespace DiscordDnDBot.Services
 {
@@ -56,20 +54,20 @@ namespace DiscordDnDBot.Services
         }
 
         // DiscordSocketClient and InteractionService are injected automatically from the IServiceProvider
-        public LoggingService(DiscordSocketClient client, InteractionService interactionService, 
+        public LoggingService(DiscordSocketClient client, InteractionService interactionService,
             IConfigurationRoot configurationRoot)
         {
             LogDirectory = Path.Combine(AppContext.BaseDirectory, "logs");
-            _logFile = 
+            _logFile =
                 new FileInfo(Path.Combine(LogDirectory, $"{DateTime.Now:yyyy'-'MM'-'dd'-'HH'-'mm'-'ss}.log"));
 
             _client = client;
             _interactionService = interactionService;
             _configurationRoot = configurationRoot;
 
-            _logLevel = 
-                Enum.TryParse(_configurationRoot["LogLevel"], out LogSeverity logLevel) 
-                ? (int)logLevel 
+            _logLevel =
+                Enum.TryParse(_configurationRoot["LogLevel"], out LogSeverity logLevel)
+                ? (int)logLevel
                 : (int)LogSeverity.Info;
 
             _client.Log += LogAsync;
@@ -121,8 +119,8 @@ namespace DiscordDnDBot.Services
             using StreamWriter writer = _logFile.AppendText();
             await writer.WriteLineAsync(output);
         }
-    
-        public async Task LogAsync(string message, string source, LogSeverity severity = LogSeverity.Info, 
+
+        public async Task LogAsync(string message, string source, LogSeverity severity = LogSeverity.Info,
             Exception? exception = null)
         {
             await LogAsync(new LogMessage(severity, message, source, exception));

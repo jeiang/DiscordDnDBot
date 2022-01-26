@@ -1,13 +1,10 @@
-﻿using System.Text.RegularExpressions;
-
+﻿using Discord;
+using Discord.Interactions;
 using DiscordDnDBot.Helpers;
 using DiscordDnDBot.Services;
 using DiscordDnDBot.Types;
 using DiscordDnDBot.Types.Database;
-
-using Discord;
-using Discord.Interactions;
-
+using System.Text.RegularExpressions;
 using TimeZoneNames;
 
 namespace DiscordDnDBot.ApplicationCommands.SlashCommands
@@ -21,7 +18,7 @@ namespace DiscordDnDBot.ApplicationCommands.SlashCommands
         [RequireOwner(Group = "AdminRole")]
         [RequireUserPermission(GuildPermission.Administrator, Group = "AdminRole")]
         [Group("admin", "Timezone tools for administrators.")]
-        public class TimezoneAdminTools: InteractionModuleBase
+        public class TimezoneAdminTools : InteractionModuleBase
         {
             private readonly DatabaseService _databaseService;
             private readonly Regex _utcRegex;
@@ -132,7 +129,7 @@ namespace DiscordDnDBot.ApplicationCommands.SlashCommands
                 Capture capture = utcMatch.Captures[1];
                 if (int.TryParse(capture.Value, out int result))
                 {
-                    TimeZoneInfo? tz = 
+                    TimeZoneInfo? tz =
                         TimeZoneInfo.GetSystemTimeZones()
                         .Where((tz) => tz.BaseUtcOffset.Hours == result)
                         .FirstOrDefault();
@@ -177,7 +174,7 @@ namespace DiscordDnDBot.ApplicationCommands.SlashCommands
                 .WithTitle(nameof(TimeZoneTools))
             .AddField(
                 (guildUser?.Nickname ?? ($"{Context.User.Username}#{Context.User.Discriminator}")) +
-                $"'s timezone has been {(addedNew ? "saved as" : "updated to")} {timeZone}.", 
+                $"'s timezone has been {(addedNew ? "saved as" : "updated to")} {timeZone}.",
                 $"The date and time in " +
                 (guildUser?.Nickname ?? ($"{Context.User.Username}#{Context.User.Discriminator}")) +
                 $"'s region should be " +
@@ -226,15 +223,15 @@ namespace DiscordDnDBot.ApplicationCommands.SlashCommands
                     Defaults.CreateEmbedBuilder(Context)
                     .WithTitle(nameof(TimeZoneTools))
                     .AddField(
-                        (user == Context.User 
-                        ? "Your " 
+                        (user == Context.User
+                        ? "Your "
                         : $"{guildUser?.Nickname ?? ($"{user.Username}#{user.Discriminator}")}'s ") +
                         $"timezone is saved as " +
                         $"{player.TimeZone}.", $"The date and time in your region is " +
                         $"{TimeZoneInfo.ConvertTime(DateTime.UtcNow, player.TimeZone):MMM dd, yyyy hh:mm tt}." +
                         "\n\nIf this is incorrect, " +
-                        (user == Context.User 
-                        ? "use" 
+                        (user == Context.User
+                        ? "use"
                         : $"ask {guildUser?.Nickname ?? ($"{user.Username}#{user.Discriminator}")} or an admin to use") +
                         $" `/timezone set` to correct it.")
                     .WithCurrentTimestamp()
@@ -279,8 +276,8 @@ namespace DiscordDnDBot.ApplicationCommands.SlashCommands
                 ? DateTime.UtcNow
                 : TimeZoneInfo.ConvertTime(date.Value, player.TimeZone, TimeZoneInfo.Utc);
             DateTime dateTime =
-                date == null 
-                ? TimeZoneInfo.ConvertTime(DateTime.UtcNow, player.TimeZone) 
+                date == null
+                ? TimeZoneInfo.ConvertTime(DateTime.UtcNow, player.TimeZone)
                 : date.Value;
             TimeZoneValues tzName =
                 TZNames.GetAbbreviationsForTimeZone(player.TimeZone.Id, "en-US");
@@ -289,9 +286,9 @@ namespace DiscordDnDBot.ApplicationCommands.SlashCommands
                 Defaults.CreateEmbedBuilder(Context)
                 .WithTitle(nameof(TimeZoneTools))
                 .AddField(
-                    $"{guildUser?.Nickname ?? ($"{user.Username}#{user.Discriminator}")}'s Timezone", 
+                    $"{guildUser?.Nickname ?? ($"{user.Username}#{user.Discriminator}")}'s Timezone",
                     $"Time: {dateTime:MMM dd, yyyy hh:mm tt}", true)
-                .AddField("Your Timezone",$"Time: <t:{offset.ToUnixTimeSeconds()}>", true)
+                .AddField("Your Timezone", $"Time: <t:{offset.ToUnixTimeSeconds()}>", true)
                 .WithCurrentTimestamp()
                 .Build();
             _ = await FollowupAsync(embed: embed, ephemeral: ephemeral);

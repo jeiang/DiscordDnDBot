@@ -1,9 +1,7 @@
-﻿using DiscordDnDBot.Services;
-
-using Discord;
+﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-
+using DiscordDnDBot.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -33,8 +31,9 @@ namespace DiscordDnDBot
             ConfigureServices(services);
 
             var provider = services.BuildServiceProvider();                     // Build the service provider
-            _ = provider.GetRequiredService<LoggingService>();                      // Start the logging service
-            _ = provider.GetRequiredService<ApplicationCommandService>(); 		    // Start the command handler service
+            _ = provider.GetRequiredService<LoggingService>();                  // Start the logging service
+            _ = provider.GetRequiredService<ApplicationCommandService>(); 		// Start the command handler service
+            _ = provider.GetRequiredService<DiscordEventService>();
             await provider.GetRequiredService<StartupService>().StartAsync();   // Start the startup service
             await Task.Delay(-1);                                               // Keep the program alive
         }
@@ -50,9 +49,9 @@ namespace DiscordDnDBot
             Configuration.GetSection(nameof(DiscordSocketConfig)).Bind(clientConfig);
             clientConfig.LogLevel = logLevel;
             // NOTE: This fixes bug with config changing null to string.empty on string (not string?)
-            clientConfig.GatewayHost = 
-                string.IsNullOrEmpty(clientConfig.GatewayHost) 
-                ? null 
+            clientConfig.GatewayHost =
+                string.IsNullOrEmpty(clientConfig.GatewayHost)
+                ? null
                 : clientConfig.GatewayHost;
 
             InteractionServiceConfig interactionServiceConfig = new();
@@ -68,8 +67,8 @@ namespace DiscordDnDBot
                 .AddSingleton<ApplicationCommandService>()  // Add the command handler to the collection
                 .AddSingleton<StartupService>()             // Add startupservice to the collection
                 .AddSingleton<LoggingService>()             // Add loggingservice to the collection
-                .AddSingleton<DatabaseService>()             // Add databaseservice to the collection
-                .AddSingleton<Random>()                     // Add random to the collection
+                .AddSingleton<DatabaseService>()            // Add databaseservice to the collection
+                .AddSingleton<DiscordEventService>()        // Add discordEventService to the collection
                 .AddSingleton(Configuration);               // Add the configuration to the collection
         }
     }

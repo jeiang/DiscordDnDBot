@@ -12,7 +12,7 @@ namespace DiscordDnDBot.Types
             {
                 return null;
             }
-            
+
             TimeZoneResult? tz = TimeZoneLookup.GetTimeZone(coordinates.Latitude, coordinates.Longitude);
             return tz == null ? null : TimeZoneInfo.FindSystemTimeZoneById(tz.Result);
         }

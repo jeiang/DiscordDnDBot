@@ -1,14 +1,11 @@
-﻿using System.Reflection;
-using System.Text;
-
-using DiscordDnDBot.Helpers;
-using DiscordDnDBot.Types.Converters;
-
-using Discord;
+﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-
+using DiscordDnDBot.Helpers;
+using DiscordDnDBot.Types.Converters;
 using Microsoft.Extensions.Configuration;
+using System.Reflection;
+using System.Text;
 
 namespace DiscordDnDBot.Services
 {
@@ -30,7 +27,7 @@ namespace DiscordDnDBot.Services
 
             if (modulesToLoad.Length == 0)
             {
-                await _loggingService.LogAsync("CommandService", "No modules detected in current assembly.", 
+                await _loggingService.LogAsync("CommandService", "No modules detected in current assembly.",
                     LogSeverity.Critical);
                 Environment.Exit(-1);
             }
@@ -86,7 +83,7 @@ namespace DiscordDnDBot.Services
                 {
                     foreach (SocketApplicationCommand cmd in guildCommands)
                     {
-                        await _loggingService.LogAsync("CommandService", 
+                        await _loggingService.LogAsync("CommandService",
                             $"Unloading Command {cmd.Name} in guild \"{cmd.Guild}\".");
                         await cmd.DeleteAsync();
                     }
@@ -94,7 +91,7 @@ namespace DiscordDnDBot.Services
                 }
                 if (guildConfig.GetSection("LoadNewCommands").Get<bool>())
                 {
-                    await _loggingService.LogAsync("CommandService", 
+                    await _loggingService.LogAsync("CommandService",
                         $"Loading commands on Discord for guild {guild.Name}.");
                     guildCommands.UnionWith(
                         await _interactions.AddModulesToGuildAsync(guild, deleteMissing: true, modules: modulesToLoad));
@@ -147,7 +144,7 @@ namespace DiscordDnDBot.Services
                 };
 
                 await _loggingService.LogAsync("CommandService", $"Command \"{info.Name}\" was " +
-                    $"executed unsuccessfully by user \"{ctx.User.Username} in {ctx.Guild.Name}\".\n\t{output}", 
+                    $"executed unsuccessfully by user \"{ctx.User.Username} in {ctx.Guild.Name}\".\n\t{output}",
                     LogSeverity.Error);
 
                 _ = await ctx.Channel.SendMessageAsync(
@@ -169,7 +166,7 @@ namespace DiscordDnDBot.Services
             }
         }
 
-        public ApplicationCommandService(IConfigurationRoot config, IServiceProvider services, 
+        public ApplicationCommandService(IConfigurationRoot config, IServiceProvider services,
             InteractionService interactions, DiscordSocketClient client, LoggingService loggingService)
         {
             _config = config;

@@ -1,7 +1,6 @@
-﻿using System.Globalization;
-
-using Discord;
+﻿using Discord;
 using Discord.Interactions;
+using System.Globalization;
 
 namespace DiscordDnDBot.Types.Converters
 {

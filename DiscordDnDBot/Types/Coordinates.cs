@@ -1,7 +1,5 @@
-﻿using System.Net;
-using System.Net.Http.Headers;
-
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System.Net;
 
 namespace DiscordDnDBot.Types
 {
@@ -50,7 +48,7 @@ namespace DiscordDnDBot.Types
             {
                 return NaN;
             }
-            
+
             try
             {
                 return new Coordinates()
