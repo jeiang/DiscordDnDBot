@@ -1,0 +1,45 @@
+{
+  "Token": "",
+  "LogLevel": "Debug",
+  "ApplicationCommands": {
+    "Global": {
+      "DeleteOldCommands": false,
+      "LoadNewCommands": false
+    },
+    "Guilds": {
+      "123456789123456789": {
+        "DeleteOldCommands": false,
+        "LoadNewCommands": false
+      }
+    }
+  },
+  "DatabasePath": "",
+  "InteractionServiceConfig": {
+    "DefaultRunMode": 1,
+    "ThrowOnError": true,
+    "InteractionCustomIdDelimiters": null,
+    "WildCardExpression": null,
+    "UseCompiledLambda": true,
+    "EnableAutocompleteHandlers": true,
+    "AutoServiceScopes": true
+  },
+  "DiscordSocketConfig": {
+    "GatewayHost": null,
+    "ConnectionTimeout": 30000,
+    "ShardId": null,
+    "TotalShards": null,
+    "AlwaysDownloadDefaultStickers": false,
+    "AlwaysResolveStickers": false,
+    "MessageCacheSize": 200,
+    "LargeThreshold": 250,
+    "AlwaysDownloadUsers": false,
+    "HandlerTimeout": 3000,
+    "IdentifyMaxConcurrency": 1,
+    "MaxWaitBetweenGuildAvailablesBeforeReady": 10000,
+    "GatewayIntents": 97983,
+    "LogGatewayIntentWarnings": true,
+    "DefaultRetryMode": 13,
+    "UseSystemClock": true,
+    "UseInteractionSnowflakeDate": true
+  }
+}
